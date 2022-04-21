@@ -2,27 +2,42 @@ package ru.learnup.tests;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.hamcrest.CoreMatchers;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.learnup.dao.CreateTokenRequest;
+import ru.learnup.dao.CreateTokenResponse;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNot.not;
 
 public class CreateTokenTests {
+    private static final String PROPERTIES_FILE_PATH = "src/test/resources/application.properties";
+    private static CreateTokenRequest request;
+    static Properties properties = new Properties();
+    static private String baseUrl;
+
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws IOException {
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
+        request = CreateTokenRequest.builder()
+                .username("admin")
+                .password("password123")
+                .build();
+
+        properties.load(new FileInputStream(PROPERTIES_FILE_PATH));
+        RestAssured.baseURI = properties.getProperty("base.url");
     }
 
     @Test
     void createTokenPositiveTest() {
-        given()//предусловия, подготовка
+        CreateTokenResponse response = given()//предусловия, подготовка
                 .log()
                 .method()
                 .log()
@@ -30,16 +45,16 @@ public class CreateTokenTests {
                 .log()
                 .body()
                 .header("Content-Type", "application/json")
-                .body("{\n"
-                        + "    \"username\" : \"admin\",\n"
-                        + "    \"password\" : \"password123\"\n"
-                        + "}")
+                .body(request)
                 .expect()
                 .statusCode(200)
-                .body("token", is(CoreMatchers.not(nullValue())))
                 .when()
-                .post("https://restful-booker.herokuapp.com/auth")//шаг(и)
-                .prettyPeek(); // логируем ответ
+                .post("/auth")//шаг(и)
+                .prettyPeek() // логируем ответ
+                .then()
+                .extract()
+                .as(CreateTokenResponse.class);
+        assertThat(response.getToken().length(), equalTo(15));
     }
 
     @Test
@@ -52,12 +67,9 @@ public class CreateTokenTests {
                 .log()
                 .body()
                 .header("Content-Type", "application/json")
-                .body("{\n"
-                        + "    \"username\" : \"admin\",\n"
-                        + "    \"password\" : \"password\"\n"
-                        + "}")
+                .body(request)
                 .when()
-                .post("https://restful-booker.herokuapp.com/auth")//шаг(и)
+                .post("auth")//шаг(и)
                 .prettyPeek()
                 .then() //проверки
                 .statusCode(200)
@@ -74,10 +86,7 @@ public class CreateTokenTests {
                 .log()
                 .body()
                 .header("Content-Type", "application/json")
-                .body("{\n"
-                        + "    \"username\" : \"admin123\",\n"
-                        + "    \"password\" : \"password\"\n"
-                        + "}")
+                .body(request.withUsername("admin1233333"))
                 .when()
                 .post("https://restful-booker.herokuapp.com/auth")//шаг(и)
                 .prettyPeek();
