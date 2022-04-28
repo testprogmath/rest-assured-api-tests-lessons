@@ -1,38 +1,31 @@
 package ru.learnup.tests;
 
-import io.restassured.RestAssured;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import io.restassured.response.Response;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Properties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.learnup.dao.CreateTokenRequest;
 import ru.learnup.dao.CreateTokenResponse;
+import ru.learnup.tests.lesson35.BaseTest;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class CreateTokenTests {
-    private static final String PROPERTIES_FILE_PATH = "src/test/resources/application.properties";
+@Feature("Generate a token")
+@Story("Generate a user token")
+public class CreateTokenTests extends BaseTest {
     private static CreateTokenRequest request;
-    static Properties properties = new Properties();
-    static private String baseUrl;
-
     @BeforeAll
-    static void beforeAll() throws IOException {
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+    static void beforeSuite() {
 
         request = CreateTokenRequest.builder()
                 .username("admin")
                 .password("password123")
                 .build();
-
-        properties.load(new FileInputStream(PROPERTIES_FILE_PATH));
-        RestAssured.baseURI = properties.getProperty("base.url");
     }
 
     @Test
@@ -58,6 +51,7 @@ public class CreateTokenTests {
     }
 
     @Test
+    @Description("Create a token with a wrong password")
     void createTokenWithAWrongPasswordNegativeTest() {
         given() //предусловия, подготовка
                 .log()

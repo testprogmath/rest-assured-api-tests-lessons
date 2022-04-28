@@ -1,0 +1,26 @@
+package ru.learnup.tests.lesson35;
+
+import io.qameta.allure.Step;
+import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.RestAssured;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+import org.junit.jupiter.api.BeforeAll;
+
+public abstract class BaseTest {
+    private static final String PROPERTIES_FILE_PATH = "src/test/resources/application.properties";
+
+    static Properties properties = new Properties();
+    @BeforeAll
+    @Step("Data preparation")
+    static void beforeAll() throws IOException {
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.filters(new AllureRestAssured());
+
+
+        properties.load(new FileInputStream(PROPERTIES_FILE_PATH));
+        RestAssured.baseURI = properties.getProperty("base.url");
+    }
+
+}
