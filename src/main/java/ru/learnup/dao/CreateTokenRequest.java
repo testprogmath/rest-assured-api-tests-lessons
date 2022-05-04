@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.With;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 @With
+@ToString
 public class CreateTokenRequest {
 
     public CreateTokenRequest( String username,  String password) {

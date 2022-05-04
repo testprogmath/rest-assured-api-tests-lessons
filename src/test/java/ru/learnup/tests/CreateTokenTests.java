@@ -4,11 +4,15 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.learnup.dao.CreateTokenRequest;
 import ru.learnup.dao.CreateTokenResponse;
 import ru.learnup.tests.lesson35.BaseTest;
+import ru.learnup.tests.lesson36.Lesson36;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
@@ -18,6 +22,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Feature("Generate a token")
 @Story("Generate a user token")
 public class CreateTokenTests extends BaseTest {
+    final static Logger log = LoggerFactory.getLogger(CreateTokenTests.class);
+
     private static CreateTokenRequest request;
     @BeforeAll
     static void beforeSuite() {
@@ -26,10 +32,12 @@ public class CreateTokenTests extends BaseTest {
                 .username("admin")
                 .password("password123")
                 .build();
+        log.info(request.toString());
     }
 
     @Test
     void createTokenPositiveTest() {
+        log.info("createTokenPositiveTest начался");
         CreateTokenResponse response = given()//предусловия, подготовка
                 .log()
                 .method()
@@ -48,6 +56,7 @@ public class CreateTokenTests extends BaseTest {
                 .extract()
                 .as(CreateTokenResponse.class);
         assertThat(response.getToken().length(), equalTo(15));
+        log.info("Тест закончен");
     }
 
     @Test
@@ -72,6 +81,7 @@ public class CreateTokenTests extends BaseTest {
 
     @Test
     void createTokenWithAWrongUsernameAndPasswordNegativeTest() {
+        // "тест начался"
         Response response = given() //предусловия, подготовка
                 .log()
                 .method()
