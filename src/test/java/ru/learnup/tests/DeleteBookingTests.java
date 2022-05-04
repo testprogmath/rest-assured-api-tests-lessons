@@ -1,5 +1,6 @@
 package ru.learnup.tests;
 
+import com.github.javafaker.Faker;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 public class DeleteBookingTests {
     static String token;
     String id;
+    Faker faker = new Faker();
+
     @BeforeAll
     static void beforeAll() {
         token = given()//предусловия, подготовка
@@ -68,9 +71,9 @@ public class DeleteBookingTests {
         given()
                 .log()
                 .all()
-                .header("Cookie", "token="+token)
+                .header("Cookie", "token=" + token)
                 .when()
-                .delete("https://restful-booker.herokuapp.com/booking/"+id)
+                .delete("https://restful-booker.herokuapp.com/booking/" + id)
                 .prettyPeek()
                 .then()
                 .statusCode(201);
